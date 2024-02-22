@@ -73,7 +73,7 @@ public class ParticlesManager : MonoBehaviour
     Particle[] initBuffer;
     private float bakeTime = 0f;
     string filePath;
-
+    private float _scale = 24f;
     // Method to save baked particles data to a file
     void SaveObject(BakedParticles obj)
     {
@@ -126,9 +126,9 @@ public class ParticlesManager : MonoBehaviour
             var deltaArray = deltaDict.Value;
             for (int i = 0; i < deltaArray.Count; i++)
             {
-                byte x = (byte)((byte)(Mathf.FloorToInt(Mathf.Abs(deltaArray[i].x * 16f)) << 1) + (byte)((Mathf.Sign(deltaArray[i].x) > 0) ? 1 : 0));
-                byte y = (byte)((byte)(Mathf.FloorToInt(Mathf.Abs(deltaArray[i].y * 16f)) << 1) + (byte)((Mathf.Sign(deltaArray[i].y) > 0) ? 1 : 0));
-                byte z = (byte)((byte)(Mathf.FloorToInt(Mathf.Abs(deltaArray[i].z * 16f)) << 1) + (byte)((Mathf.Sign(deltaArray[i].z) > 0) ? 1 : 0));
+                byte x = (byte)((byte)(Mathf.FloorToInt(Mathf.Abs(deltaArray[i].x * _scale)) << 1) + (byte)((Mathf.Sign(deltaArray[i].x) > 0) ? 1 : 0));
+                byte y = (byte)((byte)(Mathf.FloorToInt(Mathf.Abs(deltaArray[i].y * _scale)) << 1) + (byte)((Mathf.Sign(deltaArray[i].y) > 0) ? 1 : 0));
+                byte z = (byte)((byte)(Mathf.FloorToInt(Mathf.Abs(deltaArray[i].z * _scale)) << 1) + (byte)((Mathf.Sign(deltaArray[i].z) > 0) ? 1 : 0));
                 DeltaMovement.Add(x);
                 DeltaMovement.Add(y);
                 DeltaMovement.Add(z);
@@ -140,19 +140,16 @@ public class ParticlesManager : MonoBehaviour
         }
         for (int i = 0; i < _startingPositions.Length; i++)
         {
-            byte x = (byte)((byte)(Mathf.FloorToInt(Mathf.Abs(_startingPositions[i].x * 16f)) << 1) + (byte)((Mathf.Sign(_startingPositions[i].x) > 0) ? 1 : 0));
-            byte y = (byte)((byte)(Mathf.FloorToInt(Mathf.Abs(_startingPositions[i].y * 16f)) << 1) + (byte)((Mathf.Sign(_startingPositions[i].y) > 0) ? 1 : 0));
-            byte z = (byte)((byte)(Mathf.FloorToInt(Mathf.Abs(_startingPositions[i].z * 16f)) << 1) + (byte)((Mathf.Sign(_startingPositions[i].z) > 0) ? 1 : 0));
+            byte x = (byte)((byte)(Mathf.FloorToInt(Mathf.Abs(_startingPositions[i].x * _scale)) << 1) + (byte)((Mathf.Sign(_startingPositions[i].x) > 0) ? 1 : 0));
+            byte y = (byte)((byte)(Mathf.FloorToInt(Mathf.Abs(_startingPositions[i].y * _scale)) << 1) + (byte)((Mathf.Sign(_startingPositions[i].y) > 0) ? 1 : 0));
+            byte z = (byte)((byte)(Mathf.FloorToInt(Mathf.Abs(_startingPositions[i].z * _scale)) << 1) + (byte)((Mathf.Sign(_startingPositions[i].z) > 0) ? 1 : 0));
             _bakedParticles.StartingPositions[i] = (new TrunkPosition(new Vector3b(x, y, z), new Vector3b((byte)scale[i * 3 + 0], (byte)scale[i * 3 + 1], (byte)scale[i * 3 + 2])));
         }
         for (int i = 0; i < DeltaMovement.Count; i++)
         {
             var howManyBits = scale[i % (particleSystem.main.maxParticles * 3)];
             bitstream.WriteByte(DeltaMovement[i], howManyBits);
-            if (i % (particleSystem.main.maxParticles * 3) == 0)
-            {
-                Debug.Log("BitOffset:" + bitstream.BitOffsetPosition / 8);
-            }
+
         }
         Debug.Log(bitstream.BitOffsetPosition);
         _bakedParticles.MaxBitstream = (int)bitstream.BitOffsetPosition;
@@ -174,7 +171,7 @@ public class ParticlesManager : MonoBehaviour
         for (int i = 0; i < particleSystem.main.maxParticles; i++)
         {
             initBuffer[i] = new Particle();
-            _startingPositions[i] = initBuffer[i].position = new Vector3(Random.Range(-10.0f, 10.0f), Random.Range(-10.0f, 10.0f), Random.Range(-10.0f, 10.0f));
+            _startingPositions[i] = initBuffer[i].position = new Vector3(Random.Range(-20.0f, 20.0f), Random.Range(-20.0f, 20.0f), Random.Range(-20.0f, 20.0f));
             initBuffer[i].velocity = Vector3.zero;
         }
         particles.SetData(initBuffer);
@@ -248,9 +245,9 @@ public class ParticlesManager : MonoBehaviour
         {
             deltaArray.Add(initBuffer[i].position - particlesArray[i].position);
             Vector3 pos = initBuffer[i].position;
-            pos.x = Mathf.Floor(pos.x * 16.0f) / 16.0f;
-            pos.y = Mathf.Floor(pos.y * 16.0f) / 16.0f;
-            pos.z = Mathf.Floor(pos.z * 16.0f) / 16.0f;
+            pos.x = Mathf.Floor(pos.x * _scale) / _scale;
+            pos.y = Mathf.Floor(pos.y * _scale) / _scale;
+            pos.z = Mathf.Floor(pos.z * _scale) / _scale;
             particlesArray[i].position = pos;
             particlesArray[i].size = initBuffer[i].position.magnitude * _deviceController.GetValue(_fakeBokeh) * 0.1f + 0.2f;
             bakeTime = _deviceController.GetAudioSource().time;

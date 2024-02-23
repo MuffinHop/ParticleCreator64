@@ -72,11 +72,11 @@ public class ParticlesManager : MonoBehaviour
     int kernelIndex;
     Particle[] initBuffer;
     private float bakeTime = 0f;
-    string filePath;
-    private float _scale = 24f;
+    private float _scale = 32f;
     // Method to save baked particles data to a file
     void SaveObject(BakedParticles obj)
     {
+        string filePath = Application.dataPath + "/objectData.bin";
         using (FileStream file = File.Create(filePath))
         {
             using (BinaryWriter writer = new BinaryWriter(file))
@@ -200,8 +200,6 @@ public class ParticlesManager : MonoBehaviour
         _bakedParticles.TotalFrames = Mathf.CeilToInt(_deviceController.GetAudioSource().clip.length * 25);
         _bakedParticles.TotalTime = _deviceController.GetAudioSource().clip.length;
         _bakedParticles.ParticlesPerFrame = particleSystem.main.maxParticles;
-        filePath = Application.dataPath + "/objectData.bin";
-        Debug.Log(filePath);
         DeltaMovement = new List<byte>();
         _deltaChange = new Dictionary<int, List<Vector3>>();
     }

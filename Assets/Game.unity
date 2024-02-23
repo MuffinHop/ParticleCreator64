@@ -257,7 +257,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RecordVideo: 0
   _audioSource: {fileID: 749331590}
-  InTrackRecordMode: 1
+  InTrackRecordMode: 0
 --- !u!4 &680691140
 Transform:
   m_ObjectHideFlags: 0
